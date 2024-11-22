@@ -78,6 +78,12 @@
         .api-key-input input {
             flex: 1; /* 入力欄が横に広がるように設定 */
         }
+        .previous-images img {
+    max-width: 35%; /* 幅を調整 (元の70%の半分程度) */
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
     </style>
 </head>
 <body>
@@ -102,6 +108,12 @@
             <button id="complete-button" style="display:none;">完成</button>
         </div>
         <div class="chat-box" id="chat-box"></div>
+
+        <div class="previous-images" id="previous-images">
+            <h2>評価された写真</h2>
+            <!-- 過去の写真がここに表示されます -->
+        </div>
+        
     </div>
     <script src="test0718_1.js"></script>
 </body>

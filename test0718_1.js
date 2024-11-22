@@ -1,6 +1,8 @@
 // test0718.jsファイルの一部
 
 let apiKey = '';  // グローバル変数でAPIキーを保存
+let previousImages = []; // 過去の画像データを保存
+
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('image-input').addEventListener('change', handleImageUpload);
@@ -64,7 +66,7 @@ async function evaluateImage() {
                     },
                     {
                         role: 'user',
-                        content: 'この画像の構図を100点満点で評価し、より良い写真にするためのアドバイスをください。'
+                        content: 'この画像の構図を100点満点で評価し、より良い写真にするためのアドバイスをください。アドバイスは構図に関すること(被写体に近づく、もう少し右から撮影する)とし、一文で簡潔に教えてください。'
                     }
                 ],
                 max_tokens: 500
@@ -81,7 +83,7 @@ async function evaluateImage() {
             const advice = data.choices[0].message.content.split('\n').map(line => line.trim());
             const score = advice[0].replace('点数: ', '');
             const suggestion = advice.slice(1).join(' ');
-            appendMessage('ChatGPT', `点数: ${score}\nアドバイス: ${suggestion}`);
+            appendMessage('ChatGPT', ` ${score}\n ${suggestion}`);
         } else {
             appendMessage('ChatGPT', '評価結果を取得できませんでした。');
         }
@@ -96,6 +98,7 @@ async function evaluateImage() {
 }
 
 function retakeImage() {
+    addPreviousImage(); // 現在の画像を保存
     document.getElementById('image-input').value = '';
     document.getElementById('image-container').innerHTML = '';
     document.getElementById('retake-button').style.display = 'none';
@@ -103,12 +106,44 @@ function retakeImage() {
     document.getElementById('evaluate-button').style.display = 'none';
 }
 
+
+function addPreviousImage() {
+    const imageContainer = document.getElementById('image-container');
+    const imgElement = imageContainer.querySelector('img');
+    
+    if (imgElement) {
+        // 現在の画像を複製してリストに追加
+        const newImage = imgElement.cloneNode(true);
+        previousImages.push(newImage);
+        updatePreviousImages();
+    }
+}
+
+function updatePreviousImages() {
+    const previousImagesContainer = document.getElementById('previous-images');
+    previousImagesContainer.innerHTML = '<h2>評価された写真</h2>';
+    
+    previousImages.forEach((image, index) => {
+        const wrapper = document.createElement('div');
+        wrapper.style.textAlign = "center";
+        wrapper.style.marginBottom = "10px";
+        
+        const label = document.createElement('p');
+        label.innerText = `写真 ${index + 1}`;
+        
+        wrapper.appendChild(label);
+        wrapper.appendChild(image);
+        previousImagesContainer.appendChild(wrapper);
+    });
+}
+
+
 function completeProcess() {
     appendMessage('ChatGPT', 'お疲れさまでした！');
     document.getElementById('retake-button').style.display = 'none';
     document.getElementById('complete-button').style.display = 'none';
-    document.getElementById('image-input').value = '';
-    document.getElementById('image-container').innerHTML = '';
+    //document.getElementById('image-input').value = '';
+    //document.getElementById('image-container').innerHTML = '';
 }
 
 function appendMessage(sender, message) {
